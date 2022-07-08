@@ -24,7 +24,8 @@
 #error "We want to minimize power usage, therefore analog pins may not be used for digital purposes!"
 #endif
 
-#define _GET_PIN_INTERRUPT_LINE(pin) ((pin) <= 7 ? 2 : (pin) <= 15 ? 0 : 1)
+#define _GET_PIN_INTERRUPT_LINE(pin) ((pin) <= 7 ? 2 : (pin) <= 15 ? 0 \
+                                                                   : 1)
 #define _CAN_PIN_USE_INTX_INTERRUPT_LINE(pin) ((pin) == 2 || (pin) == 3)
 
 #if _CAN_PIN_USE_INTX_INTERRUPT_LINE(EXTERNAL_SIGNAL_PIN)
@@ -62,7 +63,8 @@ static constexpr uint8_t calculatePinChangeLine(uint8_t pin) {
 }
 
 static constexpr uint8_t calculatePinChangeLineMask(uint8_t pin) {
-    return pin <= 7 ? pin : pin <= 15 ? pin - 8 : pin - 16;
+    return pin <= 7 ? pin : pin <= 15 ? pin - 8
+                                      : pin - 16;
 }
 
 static constexpr uint8_t calculatePinChangeInterruptEnableMask(uint8_t pinChangeLine) {
@@ -114,7 +116,7 @@ static inline void setupWakeUpIrq() {
 static inline void enableWakeUpIrq() {
     // enable external interrupts
     if (calculateExternalInterruptEnableMask()) {
-        //clear pending interrupt requests
+        // clear pending interrupt requests
         EIFR = _BV(INTF0) | _BV(INTF1);
 
         // Enable needed external interrupts
@@ -123,7 +125,7 @@ static inline void enableWakeUpIrq() {
 
     // enable toggle interrupts
     if (calculatePinChangeEnable()) {
-        //clear pending interrupt requests
+        // clear pending interrupt requests
         PCIFR = _BV(PCIF0) | _BV(PCIF1) | _BV(PCIF2);
 
         // Enable pin change interrupts
@@ -145,8 +147,8 @@ static inline void disableWakeUpIrq() {
 
 static void awaitServoDone() {
     // Wait for the servo beeing disabled, aka output compare interrupt gets disabled
-    while (TIMSK1 &= _BV(OCIE1A))
-        ;
+    while (TIMSK1 &= _BV(OCIE1A)) {
+    }
 }
 
 static void enterPowerDownMode() {
