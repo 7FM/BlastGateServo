@@ -153,7 +153,7 @@ static void awaitServoDone() {
 
 static void enterPowerDownMode() {
     // Power down mode has only SM1 set but we need to enable sleep to really enter sleep on the sleep instruction
-    SMCR = SLEEP_MODE_PWR_DOWN /*SM1*/ | SE;
+    SMCR = SLEEP_MODE_PWR_DOWN /*SM1*/ | _BV(SE);
     enableWakeUpIrq();
     // Enter sleep mode
     __asm__ __volatile__(
@@ -162,7 +162,7 @@ static void enterPowerDownMode() {
         :
         :);
     // Clear sleep enable to avoid unwanted sleeps!
-    SMCR &= ~SE;
+    SMCR &= ~_BV(SE);
 }
 
 static void setupPins() {
@@ -180,9 +180,9 @@ static void setupPins() {
 }
 
 static void disableDigitalOnAnalogPins() {
-    // disable digitial input buffer on analog pins, as not used and saves energy
-    DIDR0 = ADC0D | ADC1D | ADC2D | ADC3D | ADC4D | ADC5D;
-    DIDR1 = AIN0D | AIN1D;
+    // disable digital input buffer on analog pins, as not used and saves energy
+    DIDR0 = _BV(ADC0D) | _BV(ADC1D) | _BV(ADC2D) | _BV(ADC3D) | _BV(ADC4D) | _BV(ADC5D);
+    DIDR1 = _BV(AIN0D) | _BV(AIN1D);
 }
 
 ISR(EXTERNAL_SIGNAL_PIN_ISR_VECTOR) {
